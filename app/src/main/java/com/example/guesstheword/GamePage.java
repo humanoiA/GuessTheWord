@@ -3,10 +3,10 @@ package com.example.guesstheword;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,14 +15,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GamePage extends AppCompatActivity {
 TextView loremipsum;
@@ -102,12 +102,17 @@ private StringBuilder text = new StringBuilder();
             Random random = new Random();
             int randomIndex=0;
             String temp="";
+            Pattern regex = Pattern.compile("[$&+,:;=?@.#()|]");
             while(tracker < halfWordCount){
                 randomIndex = random.nextInt(wordList.size());
-                temp=wordList.get(randomIndex);
-                Score.setText(temp);
-                wordList.set(randomIndex,"__________");
-                tracker++;
+                Matcher matcher = regex.matcher(wordList.get(randomIndex));
+                if (wordList.get(randomIndex).length() > 3 && !matcher.find()) {
+                    Log.d(String.valueOf(matcher.find()), "check: " + wordList.get(randomIndex).length());
+                    temp = wordList.get(randomIndex);
+                    Score.setText(temp);
+                    wordList.set(randomIndex, "__________");
+                    tracker++;
+                }
             }
             Log.d("", "Array:"+wordList);
             loremipsum.setText(wordList.toString().replace(",","").replace("[","").replace(".","").replace("]",""));
